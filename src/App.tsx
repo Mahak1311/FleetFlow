@@ -1,4 +1,3 @@
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
@@ -8,6 +7,8 @@ import { MaintenancePage } from '@/pages/MaintenancePage';
 import { FuelPage } from '@/pages/FuelPage';
 import { DriversPage } from '@/pages/DriversPage';
 import { AnalyticsPage } from '@/pages/AnalyticsPage';
+import { ProfilePage } from '@/pages/ProfilePage';
+import { ChatPage } from '@/pages/ChatPage';
 import { AppLayout } from '@/components/AppLayout';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
 
@@ -75,6 +76,8 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="chat" element={<ChatPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/dashboard" replace />} />

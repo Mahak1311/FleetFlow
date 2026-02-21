@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useFuelStore } from '@/store/fuelStore';
 import { useVehicleStore } from '@/store/vehicleStore';
 import { useTripStore } from '@/store/tripStore';
+import { useTranslation } from '@/lib/i18n';
 import { 
   Search, 
   Filter, 
@@ -14,7 +15,6 @@ import {
   ChevronDown,
   ChevronRight,
   TrendingUp,
-  TrendingDown,
   DollarSign,
   Activity,
   MapPin,
@@ -37,6 +37,7 @@ export function FuelPage() {
   const addLog = useFuelStore((state) => state.addLog);
   const vehicles = useVehicleStore((state) => state.vehicles);
   const trips = useTripStore((state) => state.trips);
+  const { t } = useTranslation();
 
   // UI State
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -51,8 +52,6 @@ export function FuelPage() {
   
   // Animated counters
   const [displayTotalCost, setDisplayTotalCost] = useState(0);
-  const [displayTotalLiters, setDisplayTotalLiters] = useState(0);
-  const [displayAvgPrice, setDisplayAvgPrice] = useState(0);
   const [displayCostPerKm, setDisplayCostPerKm] = useState(0);
 
   // Form State
@@ -82,8 +81,7 @@ export function FuelPage() {
         status = 'Done';
       }
 
-      const relatedTrip = trips.find(t => t.vehicleId === log.vehicleId);
-      const distance = relatedTrip?.distance || Math.floor(Math.random() * 500) + 100;
+      const distance = Math.floor(Math.random() * 500) + 100;
       const miscExpense = Math.floor(Math.random() * 50) + 10;
       
       return { ...log, status, distance, miscExpense };
@@ -163,15 +161,11 @@ export function FuelPage() {
       const progress = currentStep / steps;
       
       setDisplayTotalCost(totalFuelCost * progress);
-      setDisplayTotalLiters(totalLiters * progress);
-      setDisplayAvgPrice(avgPricePerLiter * progress);
       setDisplayCostPerKm(costPerKm * progress);
 
       if (currentStep >= steps) {
         clearInterval(interval);
         setDisplayTotalCost(totalFuelCost);
-        setDisplayTotalLiters(totalLiters);
-        setDisplayAvgPrice(avgPricePerLiter);
         setDisplayCostPerKm(costPerKm);
       }
     }, increment);
@@ -296,7 +290,7 @@ export function FuelPage() {
             </div>
             Expense & Fuel Logging
           </h1>
-          <p className="text-gray-400">Live financial tracking control system</p>
+          <p className="text-gray-400">{t.fuel.expenses}</p>
         </div>
 
         <button
@@ -304,7 +298,7 @@ export function FuelPage() {
           className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all duration-200 flex items-center gap-2 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/40 hover:scale-105"
         >
           <Plus size={20} />
-          Add an Expense
+          {t.fuel.records}
         </button>
       </div>
 
@@ -320,7 +314,7 @@ export function FuelPage() {
           <h3 className="text-2xl font-bold text-white mb-1">
             {formatCurrency(displayTotalCost)}
           </h3>
-          <p className="text-sm text-gray-400">Total Fuel Cost</p>
+          <p className="text-sm text-gray-400">{t.fuel.totalCost}</p>
         </div>
 
         <div className="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-red-500/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '50ms' }}>
@@ -333,7 +327,7 @@ export function FuelPage() {
           <h3 className="text-2xl font-bold text-white mb-1">
             {formatCurrency(totalMiscExpense)}
           </h3>
-          <p className="text-sm text-gray-400">Total Misc Expense</p>
+          <p className="text-sm text-gray-400">{t.fuel.expenses}</p>
         </div>
 
         <div className="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-purple-500/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '100ms' }}>
@@ -346,7 +340,7 @@ export function FuelPage() {
           <h3 className="text-2xl font-bold text-white mb-1">
             {formatCurrency(totalOperationalCost)}
           </h3>
-          <p className="text-sm text-gray-400">Operational Cost</p>
+          <p className="text-sm text-gray-400">{t.fuel.efficiency}</p>
         </div>
 
         <div className="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-blue-500/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '150ms' }}>
@@ -359,7 +353,7 @@ export function FuelPage() {
           <h3 className="text-2xl font-bold text-white mb-1">
             {formatCurrency(displayCostPerKm)}
           </h3>
-          <p className="text-sm text-gray-400">Cost per KM</p>
+          <p className="text-sm text-gray-400">{t.fuel.price}</p>
         </div>
       </div>
 
@@ -370,7 +364,7 @@ export function FuelPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
             <input
               type="text"
-              placeholder="Search by vehicle, location, or details..."
+              placeholder={`${t.common.search}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3 bg-dark-bg border border-dark-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200"
@@ -404,8 +398,8 @@ export function FuelPage() {
             onChange={(e) => setSortBy(e.target.value as 'date' | 'cost')}
             className="px-4 py-3 bg-dark-bg border border-dark-border rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 cursor-pointer"
           >
-            <option value="date">Sort by Date</option>
-            <option value="cost">Sort by Cost</option>
+            <option value="date">{t.fuel.fillDate}</option>
+            <option value="cost">{t.fuel.totalCost}</option>
           </select>
         </div>
       </div>
@@ -416,12 +410,12 @@ export function FuelPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-dark-border bg-dark-bg/50">
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Entry ID</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Vehicle</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Distance</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Fuel Expense</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Misc Expense</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Status</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.fuel.records}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.vehicles.title}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.trips.distance}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.fuel.expenses}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.maintenance.cost}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.vehicles.status}</th>
                 <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide"></th>
               </tr>
             </thead>

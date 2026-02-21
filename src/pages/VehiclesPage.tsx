@@ -1,14 +1,15 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useVehicleStore } from '@/store/vehicleStore';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { Plus, Search, Filter, ArrowUpDown, Edit, Trash2, Truck, X, Circle, Wrench, Loader2, CheckCircle2 } from 'lucide-react';
 import { formatNumber } from '@/lib/utils';
 import type { Vehicle, VehicleType, VehicleStatus } from '@/types';
+import { useTranslation } from '@/lib/i18n';
 
 export function VehiclesPage() {
+  const { t } = useTranslation();
   const vehicles = useVehicleStore((state) => state.vehicles);
   const addVehicle = useVehicleStore((state) => state.addVehicle);
-  const updateVehicle = useVehicleStore((state) => state.updateVehicle);
   const deleteVehicle = useVehicleStore((state) => state.deleteVehicle);
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -88,21 +89,21 @@ export function VehiclesPage() {
     const errors: Record<string, string> = {};
 
     if (!formData.licensePlate.trim()) {
-      errors.licensePlate = 'License plate is required';
+      errors.licensePlate = t.vehicles.licensePlateRequired;
     } else if (vehicles.some(v => v.licensePlate === formData.licensePlate)) {
-      errors.licensePlate = 'License plate already exists';
+      errors.licensePlate = t.vehicles.licensePlateExists;
     }
 
     if (!formData.model.trim()) {
-      errors.model = 'Model is required';
+      errors.model = t.vehicles.modelRequired;
     }
 
     if (!formData.maxCapacity || Number(formData.maxCapacity) <= 0) {
-      errors.maxCapacity = 'Valid capacity required';
+      errors.maxCapacity = t.vehicles.validCapacityRequired;
     }
 
     if (!formData.odometer || Number(formData.odometer) < 0) {
-      errors.odometer = 'Valid odometer required';
+      errors.odometer = t.vehicles.validOdometerRequired;
     }
 
     setFormErrors(errors);
@@ -152,7 +153,7 @@ export function VehiclesPage() {
   };
 
   const handleDelete = (id: string) => {
-    if (confirm('Are you sure you want to delete this vehicle?')) {
+    if (confirm(`${t.common.delete} ${t.dashboard.vehicleSingular}?`)) {
       deleteVehicle(id);
     }
   };
@@ -177,15 +178,15 @@ export function VehiclesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-1">Vehicle Registry</h1>
-          <p className="text-sm text-gray-400">Digital fleet garage • {vehicles.length} vehicles</p>
+          <h1 className="text-3xl font-bold text-white mb-1">{t.vehicles.title}</h1>
+          <p className="text-sm text-gray-400">{vehicles.length} {t.vehicles.title.toLowerCase()}</p>
         </div>
         <button
           onClick={handleOpenForm}
           className="px-5 py-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2 font-medium"
         >
           <Plus size={20} />
-          New Vehicle
+          {t.vehicles.addNewVehicle}
         </button>
       </div>
 
@@ -201,7 +202,7 @@ export function VehiclesPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
-              placeholder="Search by plate, model, or ID..."
+              placeholder={t.vehicles.searchVehicles}
               className={`w-full pl-12 pr-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-white placeholder-gray-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-200 ${
                 isSearchFocused ? 'shadow-lg' : ''
               }`}
@@ -211,7 +212,7 @@ export function VehiclesPage() {
           {/* Group By */}
           <button className="px-4 py-3 bg-dark-bg border-2 border-dark-border text-gray-300 rounded-xl hover:border-blue-500 transition-all duration-200 flex items-center gap-2">
             <Filter size={18} />
-            Group by
+            {t.common.filter}
           </button>
 
           {/* Sort By */}
@@ -220,16 +221,16 @@ export function VehiclesPage() {
             onChange={(e) => setSortBy(e.target.value as any)}
             className="px-4 py-3 bg-dark-bg border-2 border-dark-border text-gray-300 rounded-xl hover:border-blue-500 transition-all duration-200 outline-none cursor-pointer"
           >
-            <option value="plate">Sort by Plate</option>
-            <option value="model">Sort by Model</option>
-            <option value="type">Sort by Type</option>
-            <option value="odometer">Sort by Odometer</option>
+            <option value="plate">{t.vehicles.sortBy} {t.vehicles.licensePlate}</option>
+            <option value="model">{t.vehicles.sortBy} {t.vehicles.model}</option>
+            <option value="type">{t.vehicles.sortBy} {t.vehicles.type}</option>
+            <option value="odometer">{t.vehicles.sortBy} {t.vehicles.odometer}</option>
           </select>
         </div>
 
         {/* Filter Pills */}
         <div className="flex items-center gap-3 flex-wrap">
-          <span className="text-sm text-gray-400 font-medium">Filter:</span>
+          <span className="text-sm text-gray-400 font-medium">{t.dashboard.filterBy}</span>
           
           {/* Type Filters */}
           <div className="flex gap-2">
@@ -243,7 +244,7 @@ export function VehiclesPage() {
                     : 'bg-dark-hover text-gray-400 hover:text-gray-300'
                 }`}
               >
-                {type === 'all' ? 'All Types' : type}
+                {type === 'all' ? t.vehicles.allTypes : type}
               </button>
             ))}
           </div>
@@ -262,7 +263,7 @@ export function VehiclesPage() {
                     : 'bg-dark-hover text-gray-400 hover:text-gray-300'
                 }`}
               >
-                {status === 'all' ? 'All Status' : status}
+                {status === 'all' ? t.vehicles.allStatus : status}
               </button>
             ))}
           </div>
@@ -276,7 +277,7 @@ export function VehiclesPage() {
               className="ml-auto px-3 py-1.5 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-all duration-200 flex items-center gap-2 text-sm font-medium"
             >
               <X size={16} />
-              Clear
+              {t.common.clear}
             </button>
           )}
         </div>
@@ -293,27 +294,27 @@ export function VehiclesPage() {
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider cursor-pointer hover:text-blue-400 transition-colors">
                   <div className="flex items-center gap-2">
-                    Plate
+                    {t.vehicles.licensePlate}
                     <ArrowUpDown size={14} />
                   </div>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Model
+                  {t.vehicles.model}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Type
+                  {t.vehicles.type}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Capacity
+                  {t.vehicles.capacity}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Odometer
+                  {t.vehicles.odometer}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Status
+                  {t.vehicles.status}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Actions
+                  {t.dashboard.actions}
                 </th>
               </tr>
             </thead>
@@ -363,14 +364,14 @@ export function VehiclesPage() {
                     <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                       <button
                         className="p-2 text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-all duration-200"
-                        title="Edit vehicle"
+                        title={t.common.edit}
                       >
                         <Edit size={18} />
                       </button>
                       <button
                         onClick={() => handleDelete(vehicle.id)}
                         className="p-2 text-gray-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all duration-200"
-                        title="Delete vehicle"
+                        title={t.common.delete}
                       >
                         <Trash2 size={18} />
                       </button>
@@ -384,8 +385,8 @@ export function VehiclesPage() {
           {filteredVehicles.length === 0 && (
             <div className="text-center py-16">
               <Truck size={48} className="mx-auto text-gray-600 mb-4" />
-              <p className="text-gray-400 font-medium">No vehicles found</p>
-              <p className="text-sm text-gray-500 mt-1">Try adjusting your search or filters</p>
+              <p className="text-gray-400 font-medium">{t.vehicles.noVehiclesFound}</p>
+              <p className="text-sm text-gray-500 mt-1">{t.common.search}</p>
             </div>
           )}
         </div>
@@ -407,8 +408,8 @@ export function VehiclesPage() {
               <div className="absolute inset-0 bg-dark-bg/90 backdrop-blur-sm flex items-center justify-center z-50 animate-fade-in">
                 <div className="text-center">
                   <CheckCircle2 size={64} className="text-emerald-500 mx-auto mb-4 animate-scale-in" />
-                  <p className="text-xl font-bold text-white">Vehicle Added!</p>
-                  <p className="text-sm text-gray-400 mt-2">Updating registry...</p>
+                  <p className="text-xl font-bold text-white">{t.vehicles.vehicleAdded}</p>
+                  <p className="text-sm text-gray-400 mt-2">{t.vehicles.saving}</p>
                 </div>
               </div>
             )}
@@ -417,8 +418,8 @@ export function VehiclesPage() {
             <div className="sticky top-0 bg-dark-card border-b border-dark-border p-6 z-10">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-bold text-white">New Vehicle Registration</h2>
-                  <p className="text-sm text-gray-400 mt-1">Add a new vehicle to your fleet</p>
+                  <h2 className="text-2xl font-bold text-white">{t.vehicles.addNewVehicle}</h2>
+                  <p className="text-sm text-gray-400 mt-1">{t.vehicles.vehicleDetails}</p>
                 </div>
                 <button
                   onClick={handleCloseForm}
@@ -446,7 +447,7 @@ export function VehiclesPage() {
                       ? 'border-blue-500 ring-4 ring-blue-500/20'
                       : 'border-dark-border'
                   } rounded-xl text-white placeholder-transparent outline-none transition-all duration-200`}
-                  placeholder="License Plate"
+                  placeholder={t.vehicles.licensePlate}
                   required
                 />
                 <label
@@ -456,7 +457,7 @@ export function VehiclesPage() {
                       : 'top-3 text-gray-500'
                   }`}
                 >
-                  License Plate *
+                  {t.vehicles.licensePlate} *
                 </label>
                 {formErrors.licensePlate && (
                   <p className="text-xs text-red-400 mt-1 animate-shake">{formErrors.licensePlate}</p>
@@ -478,7 +479,7 @@ export function VehiclesPage() {
                       ? 'border-blue-500 ring-4 ring-blue-500/20'
                       : 'border-dark-border'
                   } rounded-xl text-white placeholder-transparent outline-none transition-all duration-200`}
-                  placeholder="Model"
+                  placeholder={t.vehicles.model}
                   required
                 />
                 <label
@@ -488,7 +489,7 @@ export function VehiclesPage() {
                       : 'top-3 text-gray-500'
                   }`}
                 >
-                  Model *
+                  {t.vehicles.model} *
                 </label>
                 {formErrors.model && (
                   <p className="text-xs text-red-400 mt-1 animate-shake">{formErrors.model}</p>
@@ -507,13 +508,13 @@ export function VehiclesPage() {
                   } rounded-xl text-white outline-none transition-all duration-200 appearance-none cursor-pointer`}
                   required
                 >
-                  <option value="Truck">Truck</option>
-                  <option value="Van">Van</option>
+                  <option value="Truck">{t.vehicles.truck}</option>
+                  <option value="Van">{t.vehicles.van}</option>
                   <option value="Semi">Semi</option>
                   <option value="Trailer">Trailer</option>
                 </select>
                 <label className="absolute -top-2.5 left-4 text-xs bg-dark-card px-2 text-blue-400">
-                  Type *
+                  {t.vehicles.type} *
                 </label>
               </div>
 
@@ -532,7 +533,7 @@ export function VehiclesPage() {
                       ? 'border-blue-500 ring-4 ring-blue-500/20'
                       : 'border-dark-border'
                   } rounded-xl text-white placeholder-transparent outline-none transition-all duration-200`}
-                  placeholder="Max Payload"
+                  placeholder={t.vehicles.maxCapacity}
                   min="0"
                   required
                 />
@@ -543,7 +544,7 @@ export function VehiclesPage() {
                       : 'top-3 text-gray-500'
                   }`}
                 >
-                  Max Payload (kg) *
+                  {t.vehicles.maxCapacity} (kg) *
                 </label>
                 {formErrors.maxCapacity && (
                   <p className="text-xs text-red-400 mt-1 animate-shake">{formErrors.maxCapacity}</p>
@@ -565,7 +566,7 @@ export function VehiclesPage() {
                       ? 'border-blue-500 ring-4 ring-blue-500/20'
                       : 'border-dark-border'
                   } rounded-xl text-white placeholder-transparent outline-none transition-all duration-200`}
-                  placeholder="Initial Odometer"
+                  placeholder={t.vehicles.odometerReading}
                   min="0"
                   required
                 />
@@ -576,7 +577,7 @@ export function VehiclesPage() {
                       : 'top-3 text-gray-500'
                   }`}
                 >
-                  Initial Odometer (km) *
+                  {t.vehicles.odometerReading} (km) *
                 </label>
                 {formErrors.odometer && (
                   <p className="text-xs text-red-400 mt-1 animate-shake">{formErrors.odometer}</p>
@@ -591,7 +592,7 @@ export function VehiclesPage() {
                   className="flex-1 px-4 py-3 bg-dark-hover text-gray-300 rounded-xl hover:bg-dark-border transition-all duration-200 font-medium"
                   disabled={isSaving}
                 >
-                  Cancel
+                  {t.common.cancel}
                 </button>
                 <button
                   type="submit"
@@ -601,12 +602,12 @@ export function VehiclesPage() {
                   {isSaving ? (
                     <>
                       <Loader2 size={18} className="animate-spin" />
-                      Saving...
+                      {t.vehicles.saving}
                     </>
                   ) : (
                     <>
                       <Plus size={18} />
-                      Add Vehicle
+                      {t.vehicles.addVehicle}
                     </>
                   )}
                 </button>

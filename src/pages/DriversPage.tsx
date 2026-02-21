@@ -1,5 +1,6 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useDriverStore } from '@/store/driverStore';
+import { useTranslation } from '@/lib/i18n';
 import {
   Search,
   Filter,
@@ -23,6 +24,7 @@ import type { Driver, DriverStatus } from '@/types';
 export function DriversPage() {
   const drivers = useDriverStore((state) => state.drivers);
   const updateDriver = useDriverStore((state) => state.updateDriver);
+  const { t } = useTranslation();
 
   // UI State
   const [searchQuery, setSearchQuery] = useState('');
@@ -207,7 +209,7 @@ export function DriversPage() {
           </h1>
           <p className="text-gray-400 flex items-center gap-2">
             <Activity size={16} className="text-emerald-400 animate-pulse" />
-            Monitoring {drivers.length} drivers in real-time
+            {t.drivers.title} {drivers.length}
           </p>
         </div>
       </div>
@@ -222,7 +224,7 @@ export function DriversPage() {
             <TrendingUp size={16} className="text-emerald-400" />
           </div>
           <h3 className="text-2xl font-bold text-white mb-1">{displayActiveDrivers}</h3>
-          <p className="text-sm text-gray-400">Active Drivers</p>
+          <p className="text-sm text-gray-400">{t.drivers.active}</p>
         </div>
 
         <div className="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-red-500/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '50ms' }}>
@@ -233,7 +235,7 @@ export function DriversPage() {
             {suspendedDrivers > 0 && <AlertTriangle size={16} className="text-red-400 animate-pulse" />}
           </div>
           <h3 className="text-2xl font-bold text-white mb-1">{displaySuspended}</h3>
-          <p className="text-sm text-gray-400">Suspended Drivers</p>
+          <p className="text-sm text-gray-400">{t.drivers.inactive}</p>
         </div>
 
         <div className="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-amber-500/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '100ms' }}>
@@ -244,7 +246,7 @@ export function DriversPage() {
             {expiringLicenses > 0 && <AlertTriangle size={16} className="text-amber-400 animate-pulse" />}
           </div>
           <h3 className="text-2xl font-bold text-white mb-1">{displayExpiring}</h3>
-          <p className="text-sm text-gray-400">Expiring Licenses</p>
+          <p className="text-sm text-gray-400">{t.drivers.licenseNumber}</p>
         </div>
 
         <div className="bg-dark-card border border-dark-border rounded-xl p-6 hover:border-blue-500/30 transition-all duration-300 animate-fade-in" style={{ animationDelay: '150ms' }}>
@@ -255,7 +257,7 @@ export function DriversPage() {
             <span className="text-xs text-gray-500 bg-dark-bg px-2 py-1 rounded">Avg</span>
           </div>
           <h3 className="text-2xl font-bold text-white mb-1">{displayAvgSafety.toFixed(1)}</h3>
-          <p className="text-sm text-gray-400">Safety Score</p>
+          <p className="text-sm text-gray-400">{t.drivers.safetyScore}</p>
         </div>
       </div>
 
@@ -266,7 +268,7 @@ export function DriversPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={20} />
             <input
               type="text"
-              placeholder="Search by name, license, or email..."
+              placeholder={`${t.common.search}...`}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-11 pr-4 py-3 bg-dark-bg border border-dark-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 focus:scale-[1.02] transition-all duration-200"
@@ -286,7 +288,7 @@ export function DriversPage() {
                       : 'bg-dark-bg text-gray-400 hover:text-white hover:bg-dark-hover border border-dark-border'
                   }`}
                 >
-                  {status}
+                  {status === 'All' ? t.drivers.allDrivers : status}
                 </button>
               ))}
             </div>
@@ -297,9 +299,9 @@ export function DriversPage() {
             onChange={(e) => setSortBy(e.target.value as 'name' | 'safety' | 'completion')}
             className="px-4 py-3 bg-dark-bg border border-dark-border rounded-lg text-white focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-200 cursor-pointer"
           >
-            <option value="name">Sort by Name</option>
-            <option value="safety">Sort by Safety</option>
-            <option value="completion">Sort by Completion</option>
+            <option value="name">{t.drivers.name}</option>
+            <option value="safety">{t.drivers.safetyScore}</option>
+            <option value="completion">{t.trips.completed}</option>
           </select>
         </div>
       </div>
@@ -310,13 +312,13 @@ export function DriversPage() {
           <table className="w-full">
             <thead>
               <tr className="border-b border-dark-border bg-dark-bg/50">
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Name</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">License #</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Expiry</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Completion Rate</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Safety Score</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Complaints</th>
-                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Status</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.drivers.name}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.drivers.licenseNumber}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.maintenance.date}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.trips.completed}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.drivers.safetyScore}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.drivers.status}</th>
+                <th className="text-left py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.vehicles.status}</th>
               </tr>
             </thead>
             <tbody>

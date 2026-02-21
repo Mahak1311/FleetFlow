@@ -8,6 +8,7 @@ interface AuthState {
   register: (name: string, email: string, password: string, role: string) => boolean;
   logout: () => void;
   hasRole: (roles: string[]) => boolean;
+  updateUser: (updates: Partial<Omit<User, 'id' | 'role'>>) => void;
 }
 
 // Mock users database
@@ -91,5 +92,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   hasRole: (roles: string[]) => {
     const { user } = get();
     return user ? roles.includes(user.role) : false;
+  },
+  
+  updateUser: (updates: Partial<Omit<User, 'id' | 'role'>>) => {
+    const { user } = get();
+    if (user) {
+      set({ user: { ...user, ...updates } });
+    }
   },
 }));

@@ -7,8 +7,10 @@ import { useAlertStore } from '@/store/alertStore';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { Truck, Users, MapPin, Wrench, TrendingUp, AlertTriangle, ArrowUp, ArrowDown, Clock, ChevronRight, Plus, Filter, X, Circle } from 'lucide-react';
 import { formatDate } from '@/lib/utils';
+import { useTranslation } from '@/lib/i18n';
 
 export function DashboardPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   
   // Store hooks - currently using Zustand with mock data
@@ -101,23 +103,23 @@ export function DashboardPage() {
 
   const getTimeSince = () => {
     const seconds = Math.floor((Date.now() - lastUpdated.getTime()) / 1000);
-    if (seconds < 60) return 'Just now';
+    if (seconds < 60) return t.dashboard.justNow;
     const minutes = Math.floor(seconds / 60);
-    return `${minutes} min${minutes > 1 ? 's' : ''} ago`;
+    return `${minutes} ${t.dashboard.minutesAgo}`;
   };
 
   const statusFilters = [
-    { value: 'all', label: 'All Status' },
-    { value: 'On Trip', label: 'On Trip' },
-    { value: 'Available', label: 'Available' },
-    { value: 'In Shop', label: 'In Shop' },
+    { value: 'all', label: t.dashboard.allStatus },
+    { value: 'On Trip', label: t.dashboard.onTrip },
+    { value: 'Available', label: t.dashboard.available },
+    { value: 'In Shop', label: t.dashboard.inShop },
   ];
 
   const typeFilters = [
-    { value: 'all', label: 'All Types' },
-    { value: 'Truck', label: 'Trucks' },
-    { value: 'Van', label: 'Vans' },
-    { value: 'Container', label: 'Containers' },
+    { value: 'all', label: t.dashboard.allTypes },
+    { value: 'Truck', label: t.dashboard.trucks },
+    { value: 'Van', label: t.dashboard.vans },
+    { value: 'Container', label: t.dashboard.containers },
   ];
 
   return (
@@ -129,7 +131,7 @@ export function DashboardPage() {
             <h1 className="text-3xl font-bold text-white mb-1">Fleet Flow</h1>
             <p className="text-sm text-gray-400 flex items-center gap-2">
               <Clock size={14} />
-              Last updated {getTimeSince()}
+              {t.dashboard.lastUpdated} {getTimeSince()}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -138,7 +140,7 @@ export function DashboardPage() {
               className="relative px-4 py-2 bg-dark-card border border-dark-border text-gray-300 rounded-xl hover:bg-dark-hover hover:shadow-md transition-all duration-200 flex items-center gap-2"
             >
               <AlertTriangle size={18} />
-              Alerts
+              {t.dashboard.alerts}
               {criticalAlerts.length > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center animate-pulse">
                   {criticalAlerts.length}
@@ -150,14 +152,14 @@ export function DashboardPage() {
               className="px-4 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
             >
               <Plus size={18} />
-              New Trip
+              {t.dashboard.newTrip}
             </button>
             <button 
               onClick={() => navigate('/vehicles')}
               className="px-4 py-2 bg-emerald-600 text-white rounded-xl hover:bg-emerald-700 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex items-center gap-2"
             >
               <Plus size={18} />
-              New Vehicle
+              {t.dashboard.newVehicle}
             </button>
           </div>
         </div>
@@ -176,14 +178,14 @@ export function DashboardPage() {
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-400 font-medium">Active Fleet</p>
+              <p className="text-sm text-gray-400 font-medium">{t.dashboard.activeFleet}</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-3xl font-bold text-white">{animatedActiveFleet}</p>
                 <span className="text-sm text-gray-500">/ {vehicles.length}</span>
               </div>
               <div className="flex items-center gap-1 mt-2">
                 <Circle size={8} className="text-emerald-500 fill-emerald-500 animate-pulse" />
-                <span className="text-xs text-gray-500">Vehicles on the road</span>
+                <span className="text-xs text-gray-500">{t.dashboard.vehiclesOnRoad}</span>
               </div>
             </div>
           </div>
@@ -197,19 +199,19 @@ export function DashboardPage() {
               {maintenanceAlerts > 0 && (
                 <div className="flex items-center gap-1 text-red-600 text-sm font-medium">
                   <AlertTriangle size={16} />
-                  Critical
+                  {t.dashboard.critical}
                 </div>
               )}
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-400 font-medium">Maintenance Alerts</p>
+              <p className="text-sm text-gray-400 font-medium">{t.dashboard.maintenanceAlerts}</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-3xl font-bold text-white">{animatedAlerts}</p>
-                <span className="text-sm text-gray-500">pending</span>
+                <span className="text-sm text-gray-500">{t.dashboard.pending}</span>
               </div>
               <div className="flex items-center gap-1 mt-2">
                 <Circle size={8} className="text-amber-500 fill-amber-500" />
-                <span className="text-xs text-gray-500">Vehicles in shop</span>
+                <span className="text-xs text-gray-500">{t.dashboard.vehiclesInShop}</span>
               </div>
             </div>
           </div>
@@ -226,14 +228,14 @@ export function DashboardPage() {
               </div>
             </div>
             <div className="space-y-1">
-              <p className="text-sm text-gray-400 font-medium">Pending Cargo</p>
+              <p className="text-sm text-gray-400 font-medium">{t.dashboard.pendingCargo}</p>
               <div className="flex items-baseline gap-2">
                 <p className="text-3xl font-bold text-white">{animatedCargo}</p>
-                <span className="text-sm text-gray-500">trips</span>
+                <span className="text-sm text-gray-500">{t.dashboard.trips}</span>
               </div>
               <div className="flex items-center gap-1 mt-2">
                 <Circle size={8} className="text-gray-400 fill-gray-400" />
-                <span className="text-xs text-gray-500">Waiting for driver</span>
+                <span className="text-xs text-gray-500">{t.dashboard.waitingForDriver}</span>
               </div>
             </div>
           </div>
@@ -250,7 +252,7 @@ export function DashboardPage() {
               </div>
             </div>
             <div className="space-y-3">
-              <p className="text-sm text-gray-400 font-medium">Utilization Rate</p>
+              <p className="text-sm text-gray-400 font-medium">{t.dashboard.utilizationRate}</p>
               <div className="flex items-center gap-4">
                 <p className="text-3xl font-bold text-white">{animatedUtilization}%</p>
                 <div className="relative w-16 h-16">
@@ -273,7 +275,7 @@ export function DashboardPage() {
               </div>
               <div className="flex items-center gap-1">
                 <Circle size={8} className="text-blue-500 fill-blue-500" />
-                <span className="text-xs text-gray-500">Fleet efficiency</span>
+                <span className="text-xs text-gray-500">{t.dashboard.fleetEfficiency}</span>
               </div>
             </div>
           </div>
@@ -283,7 +285,7 @@ export function DashboardPage() {
         <div className="bg-dark-card rounded-2xl p-4 shadow-lg border border-dark-border flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2 text-gray-300 font-medium">
             <Filter size={18} />
-            <span className="text-sm">Filter by:</span>
+            <span className="text-sm">{t.dashboard.filterBy}</span>
           </div>
           
           {/* Status Pills */}
@@ -331,7 +333,7 @@ export function DashboardPage() {
               className="ml-auto px-3 py-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition-all duration-200 flex items-center gap-2 text-sm font-medium"
             >
               <X size={16} />
-              Clear Filters
+              {t.dashboard.clearFilters}
             </button>
           )}
         </div>
@@ -339,8 +341,8 @@ export function DashboardPage() {
         {/* Trips Table */}
         <div className="bg-dark-card rounded-2xl shadow-lg border border-dark-border overflow-hidden">
           <div className="p-6 border-b border-dark-border">
-            <h2 className="text-xl font-bold text-white">Recent Trips</h2>
-            <p className="text-sm text-gray-400 mt-1">Latest trip activity across your fleet • {recentTrips.length} trips shown</p>
+            <h2 className="text-xl font-bold text-white">{t.dashboard.recentTrips}</h2>
+            <p className="text-sm text-gray-400 mt-1">{t.dashboard.latestTripActivity} • {recentTrips.length} {t.dashboard.tripsShown}</p>
           </div>
           
           <div className="overflow-x-auto">
@@ -348,19 +350,19 @@ export function DashboardPage() {
               <thead className="bg-dark-bg border-b border-dark-border">
                 <tr>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Trip
+                    {t.dashboard.tripSingular}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Vehicle
+                    {t.dashboard.vehicleSingular}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Driver
+                    {t.dashboard.driverSingular}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Status
+                    {t.vehicles.status}
                   </th>
                   <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Actions
+                    {t.dashboard.actions}
                   </th>
                 </tr>
               </thead>
@@ -392,7 +394,7 @@ export function DashboardPage() {
                           <div className="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
                             <Truck size={16} className="text-blue-600" />
                           </div>
-                          <span className="text-sm text-gray-300">{vehicle?.licensePlate || 'N/A'}</span>
+                          <span className="text-sm text-gray-300">{vehicle?.licensePlate || t.dashboard.na}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -400,7 +402,7 @@ export function DashboardPage() {
                           <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center">
                             <Users size={16} className="text-emerald-600" />
                           </div>
-                          <span className="text-sm text-gray-300">{driver?.name || 'Unassigned'}</span>
+                          <span className="text-sm text-gray-300">{driver?.name || t.dashboard.unassigned}</span>
                         </div>
                       </td>
                       <td className="px-6 py-4">
@@ -430,7 +432,7 @@ export function DashboardPage() {
           <div className="fixed top-0 right-0 h-full w-96 bg-white shadow-2xl z-50 animate-slide-in-right overflow-y-auto">
             <div className="p-6 border-b border-gray-100 sticky top-0 bg-white">
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-bold text-gray-900">Critical Alerts</h2>
+                <h2 className="text-xl font-bold text-gray-900">{t.dashboard.criticalAlerts}</h2>
                 <button 
                   onClick={() => setShowAlertPanel(false)}
                   className="w-8 h-8 bg-gray-100 hover:bg-gray-200 rounded-lg flex items-center justify-center transition-colors"
@@ -438,7 +440,7 @@ export function DashboardPage() {
                   <X size={18} className="text-gray-600" />
                 </button>
               </div>
-              <p className="text-sm text-gray-500 mt-1">{criticalAlerts.length} items require attention</p>
+              <p className="text-sm text-gray-500 mt-1">{criticalAlerts.length} {t.dashboard.itemsRequireAttention}</p>
             </div>
             
             <div className="p-6 space-y-4">
@@ -461,7 +463,7 @@ export function DashboardPage() {
                         </span>
                         <span className="text-xs text-gray-400">•</span>
                         <span className="text-xs text-gray-600">
-                          High Priority
+                          {t.dashboard.highPriority}
                         </span>
                       </div>
                     </div>
@@ -474,8 +476,8 @@ export function DashboardPage() {
                   <div className="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-4">
                     <TrendingUp size={32} className="text-emerald-600" />
                   </div>
-                  <p className="text-gray-600 font-medium">All Clear!</p>
-                  <p className="text-sm text-gray-500 mt-1">No critical alerts at the moment</p>
+                  <p className="text-gray-600 font-medium">{t.dashboard.allClear}</p>
+                  <p className="text-sm text-gray-500 mt-1">{t.dashboard.noAlertsMessage}</p>
                 </div>
               )}
             </div>

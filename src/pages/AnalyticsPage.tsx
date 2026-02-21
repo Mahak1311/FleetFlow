@@ -3,6 +3,7 @@ import { useTripStore } from '@/store/tripStore';
 import { useFuelStore } from '@/store/fuelStore';
 import { useMaintenanceStore } from '@/store/maintenanceStore';
 import { useVehicleStore } from '@/store/vehicleStore';
+import { useTranslation } from '@/lib/i18n';
 import {
   DollarSign,
   TrendingUp,
@@ -21,6 +22,7 @@ export function AnalyticsPage() {
   const fuelLogs = useFuelStore((state) => state.logs);
   const maintenanceLogs = useMaintenanceStore((state) => state.logs);
   const vehicles = useVehicleStore((state) => state.vehicles);
+  const { t } = useTranslation();
 
   // UI State
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -522,7 +524,7 @@ export function AnalyticsPage() {
           </h1>
           <p className="text-gray-400 flex items-center gap-2">
             <Activity size={16} className="text-emerald-400 animate-pulse" />
-            <span>Data refreshed 2 mins ago</span>
+            <span>{t.analytics.title}</span>
           </p>
         </div>
       </div>
@@ -542,7 +544,7 @@ export function AnalyticsPage() {
           <h3 className="text-4xl font-bold text-white mb-2">
             {formatLakhs(displayFuelCost)}
           </h3>
-          <p className="text-sm text-gray-400 mb-4">Total Fuel Cost</p>
+          <p className="text-sm text-gray-400 mb-4">{t.fuel.totalCost}</p>
           
           {/* Sparkline preview on hover */}
           <div className="h-8 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -660,7 +662,7 @@ export function AnalyticsPage() {
                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Revenue</th>
                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Fuel Cost</th>
                 <th className="text-right py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Maintenance</th>
-                <th className="text-right py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Net Profit</th>
+                  <th className="text-right py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">{t.analytics.profit}</th>
                 <th className="text-center py-4 px-6 text-sm font-semibold text-gray-400 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
@@ -821,7 +823,7 @@ export function AnalyticsPage() {
               {/* Summary Cards */}
               <div className="grid grid-cols-3 gap-4 mb-6">
                 <div className="bg-dark-bg rounded-xl p-4 border border-dark-border">
-                  <div className="text-gray-400 text-sm mb-2">Total Revenue</div>
+                  <div className="text-gray-400 text-sm mb-2">{t.analytics.revenue}</div>
                   <div className="text-2xl font-bold text-emerald-400">{formatLakhs(metrics.totalRevenue)}</div>
                 </div>
                 <div className="bg-dark-bg rounded-xl p-4 border border-dark-border">
@@ -829,7 +831,7 @@ export function AnalyticsPage() {
                   <div className="text-2xl font-bold text-red-400">{formatLakhs(metrics.totalOperationalCost)}</div>
                 </div>
                 <div className="bg-dark-bg rounded-xl p-4 border border-dark-border">
-                  <div className="text-gray-400 text-sm mb-2">Net Profit</div>
+                  <div className="text-gray-400 text-sm mb-2">{t.analytics.profit}</div>
                   <div className="text-2xl font-bold text-blue-400">{formatLakhs(metrics.netProfit)}</div>
                 </div>
               </div>

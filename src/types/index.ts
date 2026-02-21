@@ -6,6 +6,10 @@ export interface User {
   email: string;
   name: string;
   role: UserRole;
+  phone?: string;
+  location?: string;
+  department?: string;
+  bio?: string;
 }
 
 // Vehicle Types

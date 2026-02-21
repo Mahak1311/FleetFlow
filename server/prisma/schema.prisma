@@ -1,0 +1,129 @@
+// This is your Prisma schema file
+// Learn more: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   // Fleet Manager, Dispatcher, Safety Officer, Financial Analyst
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vehicle {
+  id             String        @id @default(cuid())
+  registration   String        @unique
+  type           String        // Truck, Van, Car
+  make           String        // Tata, Ashok Leyland, BharatBenz, Mahindra
+  model          String
+  year           Int
+  status         String        // Available, On Trip, Maintenance, Out of Service
+  currentDriverId String?
+  mileage        Int
+  lastService    DateTime
+  nextService    DateTime
+  purchasePrice  BigInt        // In INR (paise)
+  currentValue   BigInt        // In INR (paise)
+  location       String
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  trips          Trip[]
+  fuelRecords    FuelRecord[]
+  maintenance    Maintenance[]
+}
+
+model Driver {
+  id              String   @id @default(cuid())
+  name            String
+  email           String   @unique
+  phone           String
+  licenseNumber   String   @unique
+  licenseExpiry   DateTime
+  experience      Int      // Years
+  status          String   // Active, On Leave, Terminated
+  safetyScore     Float    @default(100)
+  completionRate  Float    @default(0)
+  totalTrips      Int      @default(0)
+  onTimeDelivery  Float    @default(0)
+  photoUrl        String?
+  address         String?
+  dutyStatus      String   @default("Off Duty") // On Duty, Off Duty
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  trips           Trip[]
+}
+
+model Trip {
+  id          String   @id @default(cuid())
+  vehicleId   String
+  driverId    String
+  origin      String
+  destination String
+  distance    Float    // In kilometers
+  startTime   DateTime
+  endTime     DateTime?
+  status      String   // Scheduled, In Progress, Completed, Cancelled
+  revenue     BigInt   // In INR (paise)
+  fuelCost    BigInt   // In INR (paise)
+  cargo       String?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  driver      Driver   @relation(fields: [driverId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([driverId])
+  @@index([status])
+}
+
+model FuelRecord {
+  id           String   @id @default(cuid())
+  vehicleId    String
+  date         DateTime @default(now())
+  fuelType     String   // Diesel, Petrol, CNG
+  quantity     Float    // In liters
+  pricePerUnit Float    // Price per liter in INR
+  totalCost    BigInt   // In INR (paise)
+  location     String
+  odometer     Int      // Current mileage
+  efficiency   Float?   // km/l
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  vehicle      Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([date])
+}
+
+model Maintenance {
+  id          String   @id @default(cuid())
+  vehicleId   String
+  type        String   // Routine, Repair, Inspection, Emergency
+  description String
+  cost        BigInt   // In INR (paise)
+  scheduledDate DateTime
+  completedDate DateTime?
+  status      String   // Scheduled, In Progress, Completed, Cancelled
+  serviceProvider String?
+  parts       String?  // JSON string of parts used
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  vehicle     Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+
+  @@index([vehicleId])
+  @@index([status])
+  @@index([scheduledDate])
+}

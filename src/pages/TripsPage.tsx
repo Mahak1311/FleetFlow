@@ -2,18 +2,19 @@ import { useState, useMemo, useEffect } from 'react';
 import { useTripStore } from '@/store/tripStore';
 import { useVehicleStore } from '@/store/vehicleStore';
 import { useDriverStore } from '@/store/driverStore';
+import { useTranslation } from '@/lib/i18n';
 import { StatusPill } from '@/components/ui/StatusPill';
 import { 
-  Plus, Search, Filter, TrendingUp, AlertTriangle, Truck, User, 
-  MapPin, Circle, ArrowRight, Loader2, CheckCircle2, X, DollarSign 
+  Search, TrendingUp, AlertTriangle, Truck, 
+  MapPin, Circle, ArrowRight, Loader2, CheckCircle2, X 
 } from 'lucide-react';
-import { formatCurrency, formatDate, isLicenseExpired } from '@/lib/utils';
-import type { TripStatus, Vehicle, Driver } from '@/types';
+import { formatDate, isLicenseExpired } from '@/lib/utils';
+import type { TripStatus } from '@/types';
 
 export function TripsPage() {
   const trips = useTripStore((state) => state.trips);
   const addTrip = useTripStore((state) => state.addTrip);
-  const updateTripStatus = useTripStore((state) => state.updateTripStatus);
+  const { t } = useTranslation();
   
   const vehicles = useVehicleStore((state) => state.vehicles);
   const getVehicleById = useVehicleStore((state) => state.getVehicleById);
@@ -50,7 +51,7 @@ export function TripsPage() {
   );
 
   const availableDrivers = useMemo(() => 
-    drivers.filter(d => d.status === 'Available'), 
+    drivers.filter(d => d.status === 'On Duty'), 
     [drivers]
   );
 
@@ -147,6 +148,7 @@ export function TripsPage() {
       origin: formData.origin,
       destination: formData.destination,
       estimatedRevenue: Number(formData.estimatedRevenue),
+      status: 'Dispatched' as TripStatus,
     };
 
     addTrip(newTrip);
@@ -202,15 +204,6 @@ export function TripsPage() {
       default:
         return null;
     }
-  };
-
-  // Get driver status color
-  const getDriverStatusColor = (driver: Driver | undefined) => {
-    if (!driver) return 'gray';
-    if (driver.licenseExpiry && isLicenseExpired(driver.licenseExpiry)) return 'red';
-    if (driver.status === 'On Trip') return 'blue';
-    if (driver.status === 'Suspended') return 'red';
-    return 'emerald';
   };
 
   return (
@@ -272,7 +265,7 @@ export function TripsPage() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search trips..."
+              placeholder={t.trips.title + '...'}
               className="w-full pl-12 pr-4 py-3 bg-dark-bg border-2 border-dark-border rounded-xl text-white placeholder-gray-500 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 outline-none transition-all duration-200"
             />
           </div>
@@ -289,7 +282,7 @@ export function TripsPage() {
                     : 'bg-dark-hover text-gray-400 hover:text-gray-300'
                 }`}
               >
-                {status === 'all' ? 'All Trips' : status}
+                {status === 'all' ? t.trips.allTrips : status}
               </button>
             ))}
           </div>
@@ -300,7 +293,7 @@ export function TripsPage() {
               className="ml-auto px-3 py-2 bg-red-500/10 text-red-400 rounded-xl hover:bg-red-500/20 transition-all duration-200 flex items-center gap-2 text-sm font-medium"
             >
               <X size={16} />
-              Clear
+              {t.common.clear}
             </button>
           )}
         </div>
@@ -309,7 +302,7 @@ export function TripsPage() {
       {/* Trips Table */}
       <div className="bg-dark-card rounded-2xl shadow-lg border border-dark-border overflow-hidden">
         <div className="p-6 border-b border-dark-border">
-          <h2 className="text-xl font-bold text-white">Trip Fleet</h2>
+          <h2 className="text-xl font-bold text-white">{t.trips.title}</h2>
           <p className="text-sm text-gray-400 mt-1">Active logistics operations • {filteredTrips.length} trips shown</p>
         </div>
 
@@ -318,26 +311,25 @@ export function TripsPage() {
             <thead className="bg-dark-bg border-b border-dark-border">
               <tr>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Trip
+                  {t.trips.title}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Vehicle
+                  {t.vehicles.title}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Origin
+                  {t.trips.origin}
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
                   Destination
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                  Status
+                  {t.trips.status}
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-dark-border">
               {filteredTrips.map((trip, index) => {
                 const vehicle = getVehicleById(trip.vehicleId);
-                const driver = getDriverById(trip.driverId);
 
                 return (
                   <tr
@@ -397,8 +389,8 @@ export function TripsPage() {
           {filteredTrips.length === 0 && (
             <div className="text-center py-16">
               <Truck size={48} className="mx-auto text-gray-600 mb-4" />
-              <p className="text-gray-400 font-medium">No trips found</p>
-              <p className="text-sm text-gray-500 mt-1">Create a new trip to get started</p>
+              <p className="text-gray-400 font-medium">{t.trips.title}</p>
+              <p className="text-sm text-gray-500 mt-1">{t.trips.addTrip}</p>
             </div>
           )}
         </div>
@@ -418,8 +410,8 @@ export function TripsPage() {
         )}
 
         <div className="p-6 border-b border-dark-border">
-          <h2 className="text-xl font-bold text-white">New Trip Form</h2>
-          <p className="text-sm text-gray-400 mt-1">Plan and dispatch a new delivery</p>
+          <h2 className="text-xl font-bold text-white">{t.trips.addTrip}</h2>
+          <p className="text-sm text-gray-400 mt-1">{t.trips.title}</p>
         </div>
 
         <form onSubmit={handleDispatch} className="p-6">
@@ -459,7 +451,7 @@ export function TripsPage() {
               {formData.vehicleId && !validationErrors.vehicleId && (
                 <div className="mt-2">
                   <div className="flex items-center justify-between text-xs text-gray-400 mb-1">
-                    <span>Capacity</span>
+                    <span>{t.vehicles.capacity}</span>
                     <span>{getVehicleCapacity()}%</span>
                   </div>
                   <div className="w-full h-2 bg-dark-bg rounded-full overflow-hidden">
@@ -511,7 +503,7 @@ export function TripsPage() {
             {/* Select Driver */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Select Driver *
+                {t.trips.driver} *
               </label>
               <select
                 value={formData.driverId}
@@ -528,14 +520,11 @@ export function TripsPage() {
                 required
               >
                 <option value="">Choose a driver...</option>
-                {availableDrivers.map((driver) => {
-                  const statusColor = getDriverStatusColor(driver);
-                  return (
-                    <option key={driver.id} value={driver.id}>
-                      {driver.name} - {driver.status}
-                    </option>
-                  );
-                })}
+                {availableDrivers.map((driver) => (
+                  <option key={driver.id} value={driver.id}>
+                    {driver.name} - {driver.status}
+                  </option>
+                ))}
               </select>
               {validationErrors.driverId && (
                 <p className="text-xs text-amber-400 mt-1 animate-shake flex items-center gap-1">
@@ -548,7 +537,7 @@ export function TripsPage() {
             {/* Origin Address */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Origin Address *
+                {t.trips.origin} *
               </label>
               <input
                 type="text"
@@ -574,7 +563,7 @@ export function TripsPage() {
             {/* Destination */}
             <div className="relative">
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Destination *
+                {t.trips.destination} *
               </label>
               <input
                 type="text"
