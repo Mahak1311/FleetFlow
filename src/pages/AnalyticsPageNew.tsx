@@ -83,7 +83,7 @@ export function AnalyticsPage() {
 
   // Top 5 costliest vehicles
   const costliestVehicles = useMemo(() => {
-    const vehicleCosts = vehicles.map((vehicle) => {
+    const vehicleCosts = vehicles.map(vehicle => {
       const fuel = fuelLogs
         .filter((log) => log.vehicleId === vehicle.id)
         .reduce((sum, log) => sum + log.cost, 0);
@@ -93,9 +93,7 @@ export function AnalyticsPage() {
         .reduce((sum, log) => sum + log.cost, 0);
 
       const totalCost = fuel + maintenance;
-      // Use vehicle ID hash for consistent change value
-      const seed = vehicle.id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-      const change = (seed % 2 === 0) ? ((seed % 15) + 1) : -((seed % 10) + 1);
+      const change = Math.random() > 0.5 ? (Math.random() * 15) : -(Math.random() * 10);
 
       return {
         vehicleId: vehicle.vehicleId,
@@ -282,10 +280,11 @@ export function AnalyticsPage() {
             strokeWidth="3"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="line-draw"
             style={{
               filter: 'drop-shadow(0 0 6px rgba(59, 130, 246, 0.5))',
-              willChange: 'stroke-dashoffset'
+              strokeDasharray: hoveredPoint !== null ? '1000' : '1000',
+              strokeDashoffset: hoveredPoint !== null ? '0' : '1000',
+              animation: 'drawLine 2s ease-out forwards'
             }}
           />
 
@@ -435,15 +434,13 @@ export function AnalyticsPage() {
                   rx="4"
                   onMouseEnter={() => setHoveredBar(i)}
                   onMouseLeave={() => setHoveredBar(null)}
-                  className="cursor-pointer bar-chart-rect"
-                  data-index={i}
+                  className="cursor-pointer transition-all duration-300"
                   style={{
                     filter: isHovered ? 'drop-shadow(0 0 12px rgba(59, 130, 246, 0.6))' : 'none',
                     opacity: hoveredBar !== null && hoveredBar !== i ? 0.3 : 1,
-                    transformOrigin: 'center bottom',
-                    transformBox: 'fill-box',
-                    animationDelay: `${i * 100}ms`,
-                    willChange: 'transform, opacity'
+                    transform: isHovered ? 'scaleY(1.05)' : 'scaleY(1)',
+                    transformOrigin: `${x + barWidth / 2}px ${padding.top + chartHeight}px`,
+                    animation: `barGrowth 0.8s ease-out ${i * 100}ms backwards`
                   }}
                 />
 
@@ -853,22 +850,10 @@ export function AnalyticsPage() {
       {/* Custom Animations */}
       <style>
         {`
-          .line-draw {
-            stroke-dasharray: 1000;
-            stroke-dashoffset: 1000;
-            animation: drawLine 2s ease-out forwards;
-          }
-
           @keyframes drawLine {
             to {
               stroke-dashoffset: 0;
             }
-          }
-
-          .bar-chart-rect {
-            transform: scaleY(0);
-            animation: barGrowth 0.8s ease-out forwards;
-            transition: opacity 0.3s ease, filter 0.3s ease;
           }
 
           @keyframes barGrowth {

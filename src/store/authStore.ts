@@ -5,6 +5,7 @@ interface AuthState {
   user: User | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => boolean;
+  register: (name: string, email: string, password: string, role: string) => boolean;
   logout: () => void;
   hasRole: (roles: string[]) => boolean;
 }
@@ -13,30 +14,30 @@ interface AuthState {
 const mockUsers: (User & { password: string })[] = [
   {
     id: '1',
-    email: 'manager@fleetflow.com',
+    email: 'manager@fleetflow.in',
     password: 'password123',
-    name: 'Sarah Johnson',
+    name: 'Ananya Iyer',
     role: 'Fleet Manager',
   },
   {
     id: '2',
-    email: 'dispatcher@fleetflow.com',
+    email: 'dispatcher@fleetflow.in',
     password: 'password123',
-    name: 'Mike Rodriguez',
+    name: 'Arjun Mehta',
     role: 'Dispatcher',
   },
   {
     id: '3',
-    email: 'safety@fleetflow.com',
+    email: 'safety@fleetflow.in',
     password: 'password123',
-    name: 'James Chen',
+    name: 'Karan Malhotra',
     role: 'Safety Officer',
   },
   {
     id: '4',
-    email: 'analyst@fleetflow.com',
+    email: 'analyst@fleetflow.in',
     password: 'password123',
-    name: 'Emily Thompson',
+    name: 'Neha Gupta',
     role: 'Financial Analyst',
   },
 ];
@@ -56,6 +57,31 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       return true;
     }
     return false;
+  },
+  
+  register: (name: string, email: string, password: string, role: string) => {
+    // Check if email already exists
+    const exists = mockUsers.find((u) => u.email === email);
+    if (exists) {
+      return false;
+    }
+
+    // Create new user
+    const newUser = {
+      id: (mockUsers.length + 1).toString(),
+      email,
+      password,
+      name,
+      role: role as User['role'],
+    };
+
+    // Add to mock users
+    mockUsers.push(newUser);
+
+    // Log in the new user
+    const { password: _, ...userWithoutPassword } = newUser;
+    set({ user: userWithoutPassword, isAuthenticated: true });
+    return true;
   },
   
   logout: () => {
